@@ -1,0 +1,64 @@
+{
+    "name": "f5v50n1000_corr",
+    "n_gpu": 0,
+    "miss_spike_percent": 0.2,
+    "batch_size": 100,
+
+    "arch": {
+        "type": "VAE",
+        "args": {
+            "q_distribution": "laplace", 
+            "p_distribution", "studentt",
+            "z_prior": "laplace",
+            "input_size": 50,
+            "code_size": 50,
+            "encoder_hidden_sizes"=[10],
+            "decoder_hidden_sizes"=[10],
+            "K_train": 10,
+            "K_test": 100,
+        }
+    },
+    "dataset": {
+        "type": "MaskedDataset"
+    },
+    "preprocessor": {
+        "type": "Preprocessor",
+        "args":{
+            "type": "numeric",
+            "scaler": "StandardScaler",
+            "noise": True,
+            "noise_level": 0.5,
+            "test_split": 0.1,
+            "validation_split": 0.2,
+            "preimputation": "zero"
+        }
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 0.001,
+            "weight_decay": 0,
+            "amsgrad": true
+        }
+    },
+    "loss": "vae_loss",
+    "metrics": [
+        "mse_miss", "riemannian", "factor_eigen_diff"
+    ],
+    "lr_scheduler": {
+        "type": "StepLR",
+        "args": {
+            "step_size": 50,
+            "gamma": 0.1
+        }
+    },
+    "trainer": {
+        "epochs": 300,
+        "save_dir": "saved/",
+        "save_period": 1,
+        "verbosity": 2,      
+        "monitor": "min val_loss",
+        "early_stop": 10,
+        "tensorboard": true
+    }
+}
